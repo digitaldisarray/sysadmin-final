@@ -1,0 +1,66 @@
+---
+- name: Install Minecraft Server on AWS EC2 (Amazon Linux)
+  hosts: minecraft
+  become: yes
+  tasks:
+    - name: Ensure python3 is installed (for yum tasks)
+      yum:
+        name: python3
+        state: present
+
+    - name: Update yum and install dependencies
+      yum:
+        name:
+          - java-21-amazon-corretto-headless
+          - wget
+        state: present
+
+    - name: Download Minecraft Server
+      get_url:
+        url: https://piston-data.mojang.com/v1/objects/e6ec2f64e6080b9b5d9b471b291c33cc7f509733/server.jar
+        dest: /home/ec2-user/server.jar
+        mode: '0644'
+
+    - name: Accept Minecraft EULA
+      copy:
+        dest: /home/ec2-user/eula.txt
+        content: |
+          eula=true
+        mode: '0644'
+        owner: ec2-user
+        group: ec2-user
+
+    - name: Create Minecraft Start Script
+      copy:
+        dest: /home/ec2-user/start_minecraft.sh
+        content: |
+          #!/bin/bash
+          java -Xmx1024M -Xms1024M -jar /home/ec2-user/server.jar nogui
+        mode: '0755'
+        owner: ec2-user
+        group: ec2-user
+
+    - name: Create Minecraft Systemd Service
+      copy:
+        dest: /etc/systemd/system/minecraft.service
+        content: |
+          [Unit]
+          Description=Minecraft Server
+          After=network.target
+
+          [Service]
+          User=ec2-user
+          WorkingDirectory=/home/ec2-user
+          ExecStart=/home/ec2-user/start_minecraft.sh
+          Restart=always
+          RestartSec=5s
+
+          [Install]
+          WantedBy=multi-user.target
+        mode: '0644'
+
+    - name: Enable and start Minecraft service
+      systemd:
+        name: minecraft
+        enabled: yes
+        state: started
