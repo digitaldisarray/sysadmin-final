@@ -43,7 +43,7 @@ pip install boto3
 ```
 
 ## Diagram
-
+![diagram](https://raw.githubusercontent.com/digitaldisarray/sysadmin-final/refs/heads/main/diagram.svg)
 
 
 ## Step-by-Step Commands
