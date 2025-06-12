@@ -74,7 +74,7 @@ chmod 600 minecraft_key.pem
 Create an `inventory` file with your EC2 instance IP:
 ```
 [minecraft]
-<EC2_INSTANCE_IP> ansible_ssh_user=ec2-user ansible_ssh_private_key_file=minecraft-key.pem
+<EC2_INSTANCE_IP> ansible_ssh_user=ec2-user ansible_ssh_private_key_file=minecraft_key.pem
 ```
 
 Replace `<EC2_INSTANCE_IP>` with the output IP from Terraform and the private key path for SSH access.
